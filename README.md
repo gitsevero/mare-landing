@@ -1,5 +1,7 @@
 # Maré — landing page de perfume
 
+![Maré](hero.jpg)
+
 Landing page de uma marca fictícia de perfume: abertura em faixas, frasco 3D (Three.js) que gira com a rolagem, grade de destaques, carrossel horizontal preso à rolagem e letreiro correndo. É um arquivo HTML só, sem build e sem dependência instalada.
 
 ## Rodar
