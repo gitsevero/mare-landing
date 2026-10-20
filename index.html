@@ -1,0 +1,525 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Maré — Eau de Parfum</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Manrope:wght@400;500;600;700&display=block" rel="stylesheet">
+<style>
+:root{
+  --ivory:#f3eee6; --ink:#14161a; --sea:#0e2a3b; --sea-2:#174a63; --foam:#dce8ea;
+  --coral:#e8735c; --sand:#dcc4a0; --blush:#f2dcd3; --warm:#ebe3d6;
+  --serif:"Fraunces", Georgia, serif; --sans:"Manrope", system-ui, sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html.rec{scrollbar-width:none}
+html.rec::-webkit-scrollbar{display:none}
+body{background:var(--ivory);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+.serif{font-family:var(--serif);font-variation-settings:"opsz" 144}
+
+/* ---------- nav ---------- */
+.nav{position:fixed;inset:0 0 auto 0;height:76px;display:flex;align-items:center;justify-content:space-between;padding:0 4.5vw;z-index:40;color:var(--ink)}
+.logo{font-family:var(--serif);font-weight:500;font-size:21px;letter-spacing:.42em}
+.links{display:flex;gap:38px;font-size:14px;font-weight:500;position:absolute;left:50%;transform:translateX(-50%)}
+.nav-r{display:flex;align-items:center;gap:26px;font-size:14px;font-weight:500}
+.nav-btn{height:38px;padding:0 18px;border:1px solid currentColor;border-radius:4px;display:inline-flex;align-items:center;font-weight:600}
+.btn{display:inline-flex;align-items:center;justify-content:center;height:50px;padding:0 26px;border-radius:4px;font-size:14px;font-weight:600;letter-spacing:.01em}
+.btn-ink{background:var(--ink);color:var(--ivory)}
+
+/* ---------- canvas 3D ---------- */
+#gl{position:fixed;inset:0;width:100vw;height:100vh;z-index:1;pointer-events:none;opacity:0}
+
+/* ---------- intro ---------- */
+.intro{position:fixed;inset:0;z-index:60;display:flex;pointer-events:none}
+.faixa{flex:1;height:100%;will-change:transform}
+.intro-logo{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:.32em;font-family:var(--serif);font-weight:400;font-size:150px;color:var(--ivory);letter-spacing:0}
+.intro-logo span{display:inline-block;opacity:0;will-change:transform}
+
+/* ---------- hero ---------- */
+.hero{position:relative;height:100vh;min-height:720px;overflow:hidden;
+  background:radial-gradient(70% 80% at 80% 0%, #dfe9e9 0%, rgba(223,233,233,0) 60%), var(--ivory)}
+.waves{position:absolute;left:0;bottom:0;width:100%;height:48vh;z-index:0;overflow:visible}
+.hero-title{position:absolute;inset:0;font-family:var(--serif);font-weight:300;font-size:min(14.2vw,26vh);line-height:.86;letter-spacing:-.035em;font-variation-settings:"opsz" 144;pointer-events:none}
+.ln{position:absolute;display:block;overflow:hidden;padding:0 .04em .1em;z-index:0}
+.ln>span{display:block;transform:translate3d(0,105%,0);will-change:transform}
+.ln-1{left:4.5vw;top:14vh}
+.ln-2{right:4.5vw;bottom:8vh;z-index:2}
+.hero-title em{font-style:italic}
+.hero-side{position:absolute;right:4.5vw;top:17vh;z-index:2;width:290px;opacity:0}
+.eyebrow{font-size:12px;font-weight:600;letter-spacing:.2em;text-transform:uppercase}
+.hero-side .hero-copy{margin:18px 0 26px;font-size:17px;line-height:1.5}
+
+/* ---------- notas (rotação) ---------- */
+.notas{position:relative;height:420vh}
+.notas-sticky{position:sticky;top:0;height:100vh;overflow:hidden;
+  background:radial-gradient(52% 64% at 50% 52%, #1d5470 0%, #10314a 58%, #0a1f2c 100%)}
+.bignum{position:absolute;inset:0;z-index:0;pointer-events:none}
+.bignum span{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-weight:300;font-size:74vh;line-height:1;color:transparent;-webkit-text-stroke:1.2px rgba(220,232,234,.16);font-variation-settings:"opsz" 144;opacity:0}
+.kicker{position:absolute;left:4.5vw;top:118px;z-index:2;color:var(--ivory);opacity:0}
+.nota{position:absolute;top:50%;width:min(30vw,430px);z-index:2;color:var(--ivory);opacity:0}
+.nota.l{left:6vw}.nota.r{right:6vw;text-align:right}
+.nota .num{font-size:12px;font-weight:600;letter-spacing:.22em;color:var(--sand)}
+.nota h3{font-family:var(--serif);font-weight:300;font-size:92px;line-height:1;margin:14px 0 18px;letter-spacing:-.025em;font-variation-settings:"opsz" 144}
+.nota p{font-size:19px;line-height:1.5;color:var(--foam)}
+.prog{position:absolute;left:50%;bottom:52px;transform:translateX(-50%);z-index:2;display:flex;align-items:center;gap:16px;color:var(--ivory);font-size:13px;font-weight:600;letter-spacing:.14em;opacity:0}
+.prog i{display:block;width:160px;height:1px;background:rgba(220,232,234,.25);position:relative}
+.prog b{position:absolute;inset:0 auto 0 0;width:0;background:var(--ivory)}
+
+/* ---------- tiles ---------- */
+.tiles{position:relative;z-index:3;background:var(--ivory);padding:150px 4.5vw 130px}
+.sec-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:56px}
+.sec-head h2{font-family:var(--serif);font-weight:300;font-size:112px;line-height:.92;letter-spacing:-.035em;font-variation-settings:"opsz" 144}
+.sec-head h2 .ln{position:relative;display:block}
+.sec-head h2 .ln>span{transform:translate3d(0,105%,0)}
+.sec-head p{max-width:330px;font-size:18px;line-height:1.5;margin-bottom:12px}
+.grid{display:grid;grid-template-columns:repeat(12,1fr);grid-auto-rows:330px;gap:20px}
+.tile{position:relative;border-radius:6px;overflow:hidden;padding:38px;opacity:0;will-change:transform}
+.tile h3{font-family:var(--serif);font-weight:300;font-size:60px;line-height:1;letter-spacing:-.025em;margin:14px 0 12px;font-variation-settings:"opsz" 144}
+.tile p{font-size:17px;line-height:1.45}
+.tile .lnk{display:inline-block;margin-top:22px;font-size:14px;font-weight:600;border-bottom:1px solid currentColor;padding-bottom:3px}
+.tile img{position:absolute;pointer-events:none;will-change:transform}
+.tile-txt{position:relative;z-index:1;max-width:340px}
+.t-a{grid-column:span 7;grid-row:span 2;color:var(--ivory);background:radial-gradient(75% 70% at 66% 62%, #24627f 0%, #10314a 62%, #0b2433 100%)}
+.t-a img{height:118%;right:-2%;bottom:-16%}
+.t-b{grid-column:span 5;background:var(--foam);display:flex;flex-direction:column;justify-content:space-between}
+.tile .big{font-family:var(--serif);font-weight:300;font-size:170px;line-height:.8;letter-spacing:-.04em;font-variation-settings:"opsz" 144}
+.t-c{grid-column:span 5;color:#fff;background:linear-gradient(150deg,#f4b5a4 0%,#e8735c 100%)}
+.t-c img{height:128%;right:4%;bottom:-34%}
+.t-d{grid-column:span 4;background:var(--sand);display:flex;flex-direction:column;justify-content:space-between}
+.tile .big-sm{font-family:var(--serif);font-weight:300;font-size:110px;line-height:.85;letter-spacing:-.035em;font-variation-settings:"opsz" 144}
+.t-e{grid-column:span 8;background:linear-gradient(115deg,#efe2cc 0%,#d9b680 100%)}
+.t-e img{height:130%;right:8%;bottom:-36%}
+
+/* ---------- coleção (carrossel) ---------- */
+.colecao{position:relative;z-index:3;height:330vh;background:var(--warm)}
+.col-sticky{position:sticky;top:0;height:100vh;overflow:hidden;display:flex;flex-direction:column;justify-content:center;padding-top:40px}
+.colecao .sec-head{padding:0 4.5vw;margin-bottom:46px}
+.col-count{font-size:13px;font-weight:600;letter-spacing:.18em;margin-bottom:16px}
+.track{display:flex;gap:24px;padding:0 4.5vw;will-change:transform}
+.card{flex:0 0 430px;height:540px;border-radius:6px;position:relative;overflow:hidden;padding:30px;display:flex;flex-direction:column;justify-content:flex-end;will-change:transform}
+.card img{position:absolute;left:50%;top:6px;height:400px;transform:translateX(-50%)}
+.card h3{position:relative;font-family:var(--serif);font-weight:400;font-size:42px;letter-spacing:-.02em;font-variation-settings:"opsz" 144}
+.card .notes{position:relative;font-size:15px;margin-top:6px}
+.card .row{position:relative;display:flex;justify-content:space-between;align-items:center;margin-top:20px;padding-top:18px;border-top:1px solid rgba(20,22,26,.16);font-size:16px;font-weight:600}
+.card .add{width:40px;height:40px;border-radius:4px;background:var(--ink);color:var(--ivory);display:grid;place-items:center;font-size:20px;font-weight:400}
+.card.dark{color:var(--ivory)}
+.card.dark .row{border-top-color:rgba(243,238,230,.22)}
+.card.dark .add{background:var(--ivory);color:var(--ink)}
+
+/* ---------- marquee ---------- */
+.marquee{position:relative;z-index:3;background:var(--ink);color:var(--ivory);padding:96px 0;overflow:hidden}
+.mq-row{white-space:nowrap;font-family:var(--serif);font-size:150px;line-height:1.08;font-weight:300;letter-spacing:-.025em;will-change:transform;font-variation-settings:"opsz" 144}
+.mq-row.outline{color:transparent;-webkit-text-stroke:1.3px var(--ivory);font-style:italic}
+.mq-row i{font-style:normal;color:var(--coral)}
+.mq-row.outline i{-webkit-text-stroke:0;color:var(--coral)}
+
+/* ---------- final ---------- */
+.final{position:relative;z-index:3;background:var(--blush);padding:130px 4.5vw 0;overflow:hidden;text-align:center;min-height:100vh}
+.final h2{font-family:var(--serif);font-weight:300;font-size:176px;line-height:.9;letter-spacing:-.04em;font-variation-settings:"opsz" 144}
+.final h2 .ln{position:relative;display:inline-block}
+.final h2 .ln>span{transform:translate3d(0,105%,0)}
+.final .btn{margin-top:46px;height:58px;padding:0 34px;font-size:15px}
+.foot{display:flex;justify-content:space-between;font-size:14px;font-weight:500;padding:22px 0 26px;border-top:1px solid rgba(20,22,26,.18)}
+.foot div{display:flex;gap:34px}
+.wordmark{font-family:var(--serif);font-weight:400;font-size:26vw;line-height:.86;letter-spacing:.02em;white-space:nowrap;margin-top:56px;overflow:hidden;padding-top:.06em;will-change:transform;font-variation-settings:"opsz" 144}
+</style>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}</script>
+</head>
+<body>
+
+<div class="intro" id="intro">
+  <div class="faixa" style="background:#0e2a3b"></div>
+  <div class="faixa" style="background:#174a63"></div>
+  <div class="faixa" style="background:#e8735c"></div>
+  <div class="intro-logo" id="introLogo"><span>M</span><span>A</span><span>R</span><span>É</span></div>
+</div>
+
+<header class="nav" id="nav">
+  <a class="logo" href="#">MARÉ</a>
+  <nav class="links"><a href="#">Fragrâncias</a><a href="#">Notas</a><a href="#">Ateliê</a><a href="#">Refil</a></nav>
+  <div class="nav-r"><a href="#">Sacola (0)</a><a class="nav-btn" href="#">Comprar</a></div>
+</header>
+
+<canvas id="gl"></canvas>
+
+<section class="hero" id="hero">
+  <svg class="waves" id="waves" preserveAspectRatio="none"></svg>
+  <h1 class="hero-title">
+    <span class="ln ln-1" id="ln1"><span>O mar</span></span>
+    <span class="ln ln-2" id="ln2"><span><em>em uma</em> gota.</span></span>
+  </h1>
+  <div class="hero-side" id="heroSide">
+    <p class="eyebrow">Eau de parfum · 100 ml</p>
+    <p class="hero-copy">Sal marinho, bergamota e âmbar. Feito à mão em Ilhabela.</p>
+    <a class="btn btn-ink" href="#">Comprar — R$ 489</a>
+  </div>
+</section>
+
+<section class="notas" id="notas">
+  <div class="notas-sticky">
+    <div class="bignum"><span>01</span><span>02</span><span>03</span></div>
+    <p class="eyebrow kicker" id="kicker">As notas</p>
+    <div class="nota l"><p class="num">01 — TOPO</p><h3>Sal marinho</h3><p>Bergamota e limão-siciliano sobre a brisa salgada.</p></div>
+    <div class="nota r"><p class="num">02 — CORAÇÃO</p><h3>Flor de laranjeira</h3><p>Alga e neroli, o verde da maré baixa.</p></div>
+    <div class="nota l"><p class="num">03 — FUNDO</p><h3>Âmbar</h3><p>Madeira de deriva e almíscar, quente na pele.</p></div>
+    <div class="prog" id="prog"><span id="progNum">01</span><i><b id="progBar"></b></i><span>03</span></div>
+  </div>
+</section>
+
+<section class="tiles" id="tiles">
+  <div class="sec-head">
+    <h2><span class="ln"><span>Feito</span></span><span class="ln"><span>para durar.</span></span></h2>
+    <p>Frasco de vidro espesso, tampa de resina e refil de 200 ml.</p>
+  </div>
+  <div class="grid">
+    <div class="tile t-a"><div class="tile-txt"><p class="eyebrow">Edição permanente</p><h3>Maré Alta</h3><p>Sal marinho, bergamota e âmbar.</p><a class="lnk" href="#">Comprar →</a></div><img data-v="alta" alt=""></div>
+    <div class="tile t-b"><p class="eyebrow">Fixação</p><div><p class="big">18h</p><p style="margin-top:14px">na pele, do mar ao fim do dia.</p></div></div>
+    <div class="tile t-c"><div class="tile-txt"><p class="eyebrow">Verão 2026</p><h3>Coral</h3><p>Pitanga e flor de sal.</p></div><img data-v="coral" alt=""></div>
+    <div class="tile t-d"><p class="eyebrow">Refil</p><div><p class="big-sm">200 ml</p><p style="margin-top:14px">O frasco é para sempre.</p></div></div>
+    <div class="tile t-e"><div class="tile-txt"><p class="eyebrow">Amadeirado</p><h3>Areia</h3><p>Âmbar e madeira de deriva.</p></div><img data-v="areia" alt=""></div>
+  </div>
+</section>
+
+<section class="colecao" id="colecao">
+  <div class="col-sticky">
+    <div class="sec-head">
+      <h2><span class="ln"><span>A coleção</span></span></h2>
+      <p class="col-count"><span id="colNum">01</span> / 05</p>
+    </div>
+    <div class="track" id="track">
+      <article class="card" style="background:#d3e6ea"><img data-v="alta" alt=""><h3>Maré Alta</h3><p class="notes">Sal marinho · bergamota · âmbar</p><div class="row"><span>R$ 489</span><span class="add">+</span></div></article>
+      <article class="card" style="background:#f5d0c5"><img data-v="coral" alt=""><h3>Coral</h3><p class="notes">Pitanga · flor de sal · almíscar</p><div class="row"><span>R$ 489</span><span class="add">+</span></div></article>
+      <article class="card" style="background:#eed9bb"><img data-v="areia" alt=""><h3>Areia</h3><p class="notes">Âmbar · madeira de deriva · baunilha</p><div class="row"><span>R$ 519</span><span class="add">+</span></div></article>
+      <article class="card" style="background:#dfe6ea"><img data-v="bruma" alt=""><h3>Bruma</h3><p class="notes">Íris · névoa salina · cedro</p><div class="row"><span>R$ 489</span><span class="add">+</span></div></article>
+      <article class="card dark" style="background:#1f2a4d"><img data-v="noite" alt=""><h3>Noite</h3><p class="notes">Oud · ameixa · âmbar negro</p><div class="row"><span>R$ 559</span><span class="add">+</span></div></article>
+    </div>
+  </div>
+</section>
+
+<section class="marquee" id="marquee">
+  <div class="mq-row" id="mq1"></div>
+  <div class="mq-row outline" id="mq2"></div>
+</section>
+
+<section class="final" id="final">
+  <h2><span class="ln"><span>Sinta a maré.</span></span></h2>
+  <a class="btn btn-ink" href="#">Comprar Maré Alta — R$ 489</a>
+  <div class="wordmark"><div id="wordmark">MARÉ</div></div>
+  <div class="foot"><div><a href="#">Fragrâncias</a><a href="#">Ateliê</a><a href="#">Refil</a></div><div><a href="#">Instagram</a><a href="#">Contato</a></div></div>
+</section>
+
+<script type="module">
+import * as THREE from 'three';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+
+const REC = new URLSearchParams(location.search).has('rec');
+if (REC) document.documentElement.classList.add('rec');
+history.scrollRestoration = 'manual';
+
+const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
+const lerp = (a, b, t) => a + (b - a) * t;
+const eoc = t => 1 - Math.pow(1 - t, 3);
+const eoq = t => 1 - Math.pow(1 - t, 4);
+const eio = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+const prog = (t, s, d) => clamp((t - s) / d);
+const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+
+await Promise.all(['300 100px Fraunces', 'italic 300 100px Fraunces', '400 100px Fraunces', '500 100px Fraunces',
+  'italic 400 60px Fraunces', '500 16px Manrope', '600 16px Manrope'].map(f => document.fonts.load(f)));
+await document.fonts.ready;
+
+/* ---------------- vidro, líquido, frasco ---------------- */
+function glassMat(side) {
+  const m = new THREE.MeshPhysicalMaterial({ color: 0x000000, roughness: .05, metalness: 0, clearcoat: 1, clearcoatRoughness: .03,
+    envMapIntensity: 2.4, transparent: true, depthWrite: false, side });
+  m.onBeforeCompile = s => {
+    s.fragmentShader = s.fragmentShader.replace('#include <opaque_fragment>', `
+      float fres = pow(1.0 - abs(dot(normalize(vViewPosition), normal)), 2.6);
+      float lum = dot(outgoingLight, vec3(.2126, .7152, .0722));
+      float hl = smoothstep(.28, .9, lum);
+      vec3 col = mix(vec3(.95, .975, 1.0), outgoingLight, hl);
+      gl_FragColor = vec4(col, clamp(.025 + hl * .9 + fres * .34, 0.0, 1.0) * diffuseColor.a);
+    `);
+  };
+  return m;
+}
+function liquidMat(color) {
+  const m = new THREE.MeshPhysicalMaterial({ color, roughness: .08, metalness: 0, transparent: true, clearcoat: .7,
+    clearcoatRoughness: .08, emissive: new THREE.Color(color), emissiveIntensity: .07, envMapIntensity: 1.2 });
+  m.onBeforeCompile = s => {
+    s.fragmentShader = s.fragmentShader.replace('#include <opaque_fragment>', `
+      float fres = pow(1.0 - abs(dot(normalize(vViewPosition), normal)), 2.0);
+      gl_FragColor = vec4(outgoingLight, clamp(.7 + fres * .28, 0.0, .97));
+    `);
+  };
+  return m;
+}
+function labelTexture(edicao) {
+  const c = document.createElement('canvas'); c.width = 1024; c.height = 640;
+  const g = c.getContext('2d');
+  g.fillStyle = '#f4efe7'; g.fillRect(0, 0, 1024, 640);
+  g.strokeStyle = '#14161a'; g.lineWidth = 3; g.strokeRect(30, 30, 964, 580);
+  g.fillStyle = '#14161a'; g.textAlign = 'center';
+  g.font = '500 136px Fraunces'; g.letterSpacing = '40px'; g.fillText('MARÉ', 532, 262);
+  g.fillRect(452, 312, 120, 3);
+  g.letterSpacing = '0px'; g.font = 'italic 400 70px Fraunces'; g.fillText(edicao, 512, 420);
+  g.font = '600 30px Manrope'; g.letterSpacing = '9px'; g.fillText('EAU DE PARFUM · 100 ML', 516, 528);
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; return t;
+}
+function capGeo(r, h) {
+  const p = [new THREE.Vector2(0, 0)], rr = .04;
+  for (let i = 0; i <= 10; i++) { const a = -Math.PI / 2 + i / 10 * Math.PI / 2; p.push(new THREE.Vector2(r - rr + Math.cos(a) * rr, rr + Math.sin(a) * rr)); }
+  for (let i = 0; i <= 10; i++) { const a = i / 10 * Math.PI / 2; p.push(new THREE.Vector2(r - rr + Math.cos(a) * rr, h - rr + Math.sin(a) * rr)); }
+  p.push(new THREE.Vector2(0, h));
+  return new THREE.LatheGeometry(p, 96);
+}
+const W = 1, H = 1.25, D = .62;
+function makeBottle({ liquid, cap, edicao }) {
+  const g = new THREE.Group();
+  const geo = new RoundedBoxGeometry(W, H, D, 8, .1);
+  const back = new THREE.Mesh(geo, glassMat(THREE.BackSide)); back.renderOrder = 1;
+  const liq = new THREE.Mesh(new RoundedBoxGeometry(.86, .98, .48, 6, .07), liquidMat(liquid)); liq.position.y = -.045; liq.renderOrder = 2;
+  const front = new THREE.Mesh(geo, glassMat(THREE.FrontSide)); front.renderOrder = 3;
+  const label = new THREE.Mesh(new THREE.PlaneGeometry(.6, .375), new THREE.MeshStandardMaterial({ map: labelTexture(edicao), roughness: .8 }));
+  label.position.set(0, -.06, D / 2 + .004); label.renderOrder = 4;
+  const neck = new THREE.Mesh(new THREE.CylinderGeometry(.11, .11, .08, 48), glassMat(THREE.FrontSide)); neck.position.y = H / 2 + .03; neck.renderOrder = 3;
+  const collar = new THREE.Mesh(new THREE.CylinderGeometry(.14, .14, .07, 64), new THREE.MeshStandardMaterial({ color: 0xc9a66b, metalness: 1, roughness: .26 }));
+  collar.position.y = H / 2 + .075;
+  const capM = new THREE.Mesh(capGeo(.25, .46), new THREE.MeshPhysicalMaterial({ color: cap, roughness: .36, clearcoat: .8, clearcoatRoughness: .2 }));
+  capM.position.y = H / 2 + .105;
+  g.add(back, liq, front, label, neck, collar, capM);
+  g.position.y = -.27;
+  const wrap = new THREE.Group(); wrap.add(g); return wrap;
+}
+const VARIANTES = {
+  alta:  { liquid: 0x62b6cc, cap: 0x101418, edicao: 'Maré Alta' },
+  coral: { liquid: 0xf08a72, cap: 0xf2ebe1, edicao: 'Coral' },
+  areia: { liquid: 0xe0a04f, cap: 0x3a2a1f, edicao: 'Areia' },
+  bruma: { liquid: 0xbcd0da, cap: 0x8c98a1, edicao: 'Bruma' },
+  noite: { liquid: 0x3a4a8c, cap: 0xc9a66b, edicao: 'Noite' },
+};
+function luzes(scene, renderer) {
+  scene.environment = new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(), .04).texture;
+  const key = new THREE.DirectionalLight(0xffffff, 1.6); key.position.set(2.5, 4, 5); scene.add(key);
+  const rim = new THREE.DirectionalLight(0xcfe8ff, 1.1); rim.position.set(-4, 2, -3); scene.add(rim);
+}
+
+/* Fotos de catálogo: o mesmo frasco renderizado de 3/4 em cada edição. */
+function renderFotos() {
+  const c = document.createElement('canvas'); c.width = 720; c.height = 900;
+  const r = new THREE.WebGLRenderer({ canvas: c, antialias: true, alpha: true, preserveDrawingBuffer: true });
+  r.toneMapping = THREE.ACESFilmicToneMapping; r.outputColorSpace = THREE.SRGBColorSpace;
+  const s = new THREE.Scene(); luzes(s, r);
+  const cam = new THREE.PerspectiveCamera(26, 720 / 900, .1, 50); cam.position.set(0, .55, 6.2); cam.lookAt(0, .02, 0);
+  const out = {};
+  for (const [id, v] of Object.entries(VARIANTES)) {
+    const b = makeBottle(v); b.rotation.y = -.52; s.add(b); r.render(s, cam); out[id] = c.toDataURL('image/png'); s.remove(b);
+  }
+  r.dispose(); return out;
+}
+const fotos = renderFotos();
+await Promise.all($$('img[data-v]').map(img => { img.src = fotos[img.dataset.v]; return img.decode(); }));
+
+/* ---------------- cena principal ---------------- */
+const canvas = $('#gl');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, preserveDrawingBuffer: REC });
+renderer.setPixelRatio(REC ? 1 : Math.min(devicePixelRatio, 2));
+renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.05;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.setClearColor(0x000000, 0);
+const scene = new THREE.Scene(); luzes(scene, renderer);
+const CAM_Z = 6, FOV = 30;
+const camera = new THREE.PerspectiveCamera(FOV, 1, .1, 50); camera.position.set(0, .3, CAM_Z); camera.lookAt(0, 0, 0);
+const bottle = makeBottle(VARIANTES.alta); scene.add(bottle);
+
+const sombra = (() => {
+  const c = document.createElement('canvas'); c.width = c.height = 256; const g = c.getContext('2d');
+  const gr = g.createRadialGradient(128, 128, 0, 128, 128, 128);
+  gr.addColorStop(0, 'rgba(14,42,59,.55)'); gr.addColorStop(.5, 'rgba(14,42,59,.18)'); gr.addColorStop(1, 'rgba(14,42,59,0)');
+  g.fillStyle = gr; g.fillRect(0, 0, 256, 256);
+  const m = new THREE.Mesh(new THREE.PlaneGeometry(1.9, 1.1), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(c), transparent: true, depthWrite: false }));
+  m.rotation.x = -Math.PI / 2; m.renderOrder = 0; scene.add(m); return m;
+})();
+
+const bolhaMat = glassMat(THREE.FrontSide); bolhaMat.opacity = 0;
+const bolhaGeo = new THREE.SphereGeometry(1, 32, 16);
+const bolhas = Array.from({ length: 34 }, (_, i) => {
+  const s = (Math.sin(i * 91.7) * 43758.5453) % 1, u = Math.abs(s), v = Math.abs((Math.sin(i * 12.9) * 9631.1) % 1);
+  const m = new THREE.Mesh(bolhaGeo, bolhaMat); m.renderOrder = 5;
+  const side = i % 2 ? 1 : -1, perto = i % 3 !== 0;
+  m.userData = { x: side * (perto ? .66 + u * .32 : 2.4 + u * .3), z: -1 + v * 1.4, r: .025 + v * .05, seed: u, sp: .22 + u * .3 };
+  m.scale.setScalar(m.userData.r); scene.add(m); return m;
+});
+
+function resize() {
+  renderer.setSize(innerWidth, innerHeight, false);
+  camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix();
+}
+resize();
+if (!REC) addEventListener('resize', resize);
+
+/* ---------------- ondas do hero ---------------- */
+const svg = $('#waves');
+const ondas = [];
+function montaOndas() {
+  const vw = innerWidth, h = svg.getBoundingClientRect().height;
+  svg.setAttribute('viewBox', `0 0 ${vw} ${h}`); svg.innerHTML = '';
+  for (let i = 0; i < 6; i++) {
+    const per = vw / (2 + (i % 3)), amp = 8 + i * 3.2, y0 = h * (.18 + i * .14);
+    let d = `M ${-vw} ${y0}`;
+    for (let x = -vw; x <= vw * 2; x += 12) d += ` L ${x} ${(y0 + Math.sin(x / per * Math.PI * 2) * amp).toFixed(1)}`;
+    const p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    p.setAttribute('d', d); p.setAttribute('fill', 'none'); p.setAttribute('stroke', '#0e2a3b');
+    p.setAttribute('stroke-width', '1.2'); p.setAttribute('stroke-opacity', String(.1 + i * .04)); p.setAttribute('vector-effect', 'non-scaling-stroke');
+    svg.appendChild(p); ondas.push({ p, per, sp: 14 + i * 9, par: .04 + i * .05 });
+  }
+}
+montaOndas();
+
+/* ---------------- marquee ---------------- */
+const frase = 'sal marinho <i>·</i> bergamota <i>·</i> âmbar <i>·</i> alga <i>·</i> madeira de deriva <i>·</i> ';
+$('#mq1').innerHTML = frase.repeat(4); $('#mq2').innerHTML = frase.repeat(4);
+
+/* ---------------- loop ---------------- */
+const nav = $('#nav'), intro = $('#intro'), faixas = $$('.faixa'), letras = $$('#introLogo span');
+const ln1 = $('#ln1'), ln2 = $('#ln2'), heroSide = $('#heroSide');
+const notas = $('#notas'), notaEls = $$('.nota'), nums = $$('.bignum span'), kicker = $('#kicker'), progEl = $('#prog');
+const tiles = $('#tiles'), tileEls = $$('.tile'), headLines = $$('.tiles .sec-head .ln>span');
+const colecao = $('#colecao'), track = $('#track'), cards = $$('.card'), colHead = $$('.colecao .sec-head .ln>span');
+const mq1 = $('#mq1'), mq2 = $('#mq2'), finalEl = $('#final'), finalLn = $$('.final .ln>span'), wordmark = $('#wordmark');
+const INK = [20, 22, 26], IVORY = [243, 238, 230];
+const revelado = new Map();
+function revela(el, t, vh, lim = .88) {
+  if (!revelado.has(el) && el.getBoundingClientRect().top < vh * lim) revelado.set(el, t);
+  const t0 = revelado.get(el); return t0 === undefined ? -1 : t - t0;
+}
+let prevY = 0, skew = 0;
+
+function tick(t, y) {
+  const vw = innerWidth, vh = innerHeight;
+
+  // abertura: faixas sobem, a marca some, o título entra por máscara
+  letras.forEach((l, i) => {
+    const k = eoq(prog(t, .15 + i * .08, .8)), o = eio(prog(t, 1.0, .45));
+    l.style.opacity = k * (1 - o); l.style.transform = `translate3d(0,${(1 - k) * 70 - o * 40}px,0)`;
+  });
+  faixas.forEach((f, i) => { f.style.transform = `translate3d(0,${-eio(prog(t, 1.05 + i * .12, .95)) * 100}%,0)`; });
+  intro.style.visibility = t > 2.4 ? 'hidden' : 'visible';
+  const introK = eoc(prog(t, 1.35, 1.3));
+  [ln1, ln2].forEach((ln, i) => {
+    ln.firstElementChild.style.transform = `translate3d(0,${(1 - eoq(prog(t, 1.45 + i * .14, 1.1))) * 105}%,0)`;
+    ln.style.transform = `translate3d(0,${-y * (i ? .12 : .26)}px,0)`;
+  });
+  const hs = eoc(prog(t, 2.0, .8));
+  heroSide.style.opacity = hs; heroSide.style.transform = `translate3d(0,${(1 - hs) * 18 - y * .18}px,0)`;
+  ondas.forEach(o => { o.p.setAttribute('transform', `translate(${-((t * o.sp) % (o.per * 2))} ${-y * o.par})`); });
+
+  // notas: aproximação (a), rotação no trecho fixo (p) e saída (sai, em px)
+  const nr = notas.getBoundingClientRect();
+  const a = clamp(1 - nr.top / vh), span = nr.height - vh, p = clamp(-nr.top / span), sai = Math.max(0, -nr.top - span);
+  const ea = eio(a);
+  const upp = 2 * Math.tan(THREE.MathUtils.degToRad(FOV / 2)) * CAM_Z / vh;
+  const sc = lerp(1, 1.13, ea) * lerp(.86, 1, introK);
+  const ypx = lerp(vh * .575, vh * .5, ea) - sai + (1 - introK) * 90;
+  const baseY = (vh / 2 - ypx) * upp, bob = Math.sin(t * 1.15) * .035;
+  bottle.position.set(0, baseY + bob, 0);
+  bottle.scale.setScalar(sc);
+  bottle.rotation.set(Math.sin(t * .8) * .03, lerp(-.38 + Math.sin(t * .55) * .2, 0, ea) + p * Math.PI * 2, Math.sin(p * Math.PI * 2) * .05);
+  sombra.position.set(0, baseY - .895 * sc - .1, 0);
+  sombra.scale.setScalar(sc * (1 - bob * 1.5));
+  sombra.material.opacity = (1 - ea) * introK;
+  canvas.style.opacity = introK;
+
+  const bv = clamp((a - .78) * 4.5) * (sai < vh ? 1 : 0);
+  bolhaMat.opacity = bv;
+  bolhas.forEach(m => {
+    const d = m.userData, yy = ((d.seed * 5 + t * d.sp) % 5) - 2.5;
+    m.position.set(d.x + Math.sin(t * .9 + d.seed * 9) * .07, yy - sai * upp, d.z);
+    m.visible = bv > 0;
+  });
+
+  let ativo = 0, melhor = 0;
+  notaEls.forEach((n, i) => {
+    const c = [.2, .5, .8][i], dd = (p - c) / .16, v = clamp((1 - Math.abs(dd)) / .4);
+    n.style.opacity = v; n.style.transform = `translate3d(0,calc(-50% + ${-dd * 46}px),0)`;
+    nums[i].style.opacity = v; nums[i].style.transform = `scale(${1 + dd * .04})`;
+    if (v > melhor) { melhor = v; ativo = i; }
+  });
+  const kv = clamp((a - .55) * 2.2) * clamp(1 - sai / 200);
+  kicker.style.opacity = kv; progEl.style.opacity = kv;
+  $('#progNum').textContent = '0' + (ativo + 1); $('#progBar').style.width = (p * 100) + '%';
+
+  // cor do menu: escuro sobre as notas e o marquee
+  let esc = 0;
+  for (const el of [notas, $('#marquee')]) {
+    const r = el.getBoundingClientRect();
+    esc = Math.max(esc, clamp((38 - r.top) / 24 + .5) * clamp((r.bottom - 38) / 24 + .5));
+  }
+  nav.style.color = `rgb(${INK.map((c, i) => Math.round(lerp(c, IVORY[i], esc))).join(',')})`;
+  // fundo do menu: a cor da seção que está embaixo dele (hero e notas ficam sem fundo)
+  let fundo = 'transparent';
+  for (const [el, cor] of [[tiles, '#f3eee6'], [colecao, '#ebe3d6'], [$('#marquee'), '#14161a'], [finalEl, '#f2dcd3']]) {
+    const r = el.getBoundingClientRect(); if (r.top <= 38 && r.bottom > 38) fundo = cor;
+  }
+  nav.style.background = fundo;
+
+  // tiles: entram de baixo, com a foto em parallax
+  headLines.forEach((s, i) => { const k = eoq(clamp((revela(s.parentElement, t, vh) - i * .1) / 1.0)); s.style.transform = `translate3d(0,${(1 - k) * 105}%,0)`; });
+  tileEls.forEach((el, i) => {
+    const k = eoc(clamp((revela(el, t, vh, .92) - (i % 2) * .12) / .95));
+    el.style.opacity = k; el.style.transform = `translate3d(0,${(1 - k) * 80}px,0) scale(${.94 + .06 * k})`;
+    const img = el.querySelector('img');
+    if (img) { const r = el.getBoundingClientRect(); img.style.transform = `translate3d(0,${(r.top + r.height / 2 - vh / 2) * -.12}px,0)`; }
+  });
+
+  // coleção: a rolagem vertical vira trilho horizontal
+  const cr = colecao.getBoundingClientRect(), q = clamp(-cr.top / (cr.height - vh));
+  const viagem = track.scrollWidth - vw;
+  track.style.transform = `translate3d(${-q * viagem}px,0,0)`;
+  skew = lerp(skew, clamp((y - prevY) * -.05, -6, 6), .2);
+  cards.forEach((c, i) => {
+    c.style.transform = `skewX(${skew.toFixed(2)}deg)`;
+    const im = c.querySelector('img'), r = c.getBoundingClientRect();
+    im.style.transform = `translateX(calc(-50% + ${(r.left + r.width / 2 - vw / 2) * -.06}px)) rotate(${(r.left + r.width / 2 - vw / 2) * -.004}deg)`;
+  });
+  colHead.forEach(s => { const k = eoq(clamp(revela(s.parentElement, t, vh) / 1.0)); s.style.transform = `translate3d(0,${(1 - k) * 105}%,0)`; });
+  $('#colNum').textContent = '0' + (1 + Math.min(4, Math.round(q * 4)));
+
+  // marquee
+  const w1 = mq1.scrollWidth / 4, w2 = mq2.scrollWidth / 4, off = t * 70 + y * .45;
+  mq1.style.transform = `translate3d(${-(off % w1)}px,0,0)`;
+  mq2.style.transform = `translate3d(${-w2 + (off % w2)}px,0,0)`;
+
+  // final
+  finalLn.forEach(s => { const k = eoq(clamp(revela(s.parentElement, t, vh, .8) / 1.1)); s.style.transform = `translate3d(0,${(1 - k) * 105}%,0)`; });
+  const fr = finalEl.getBoundingClientRect(), fk = eoc(clamp((vh - fr.top) / fr.height));
+  wordmark.style.transform = `translate3d(0,${(1 - fk) * 70}%,0)`;
+
+  prevY = y;
+  if (sai < vh * 1.05) renderer.render(scene, camera);
+}
+
+if (REC) {
+  window.__frame = (t, y) => { window.scrollTo(0, y); tick(t, window.scrollY); return window.scrollY; };
+  window.__anchors = () => ({
+    vh: innerHeight,
+    notas: notas.offsetTop, notasFim: notas.offsetTop + notas.offsetHeight - innerHeight,
+    tiles: tiles.offsetTop, tilesFim: tiles.offsetTop + tiles.offsetHeight - innerHeight,
+    col: colecao.offsetTop, colFim: colecao.offsetTop + colecao.offsetHeight - innerHeight,
+    max: document.documentElement.scrollHeight - innerHeight,
+  });
+  tick(0, 0);
+  window.__ready = true;
+} else {
+  scrollTo(0, 0);
+  const t0 = performance.now();
+  const loop = ms => { tick((ms - t0) / 1000, scrollY); requestAnimationFrame(loop); };
+  requestAnimationFrame(loop);
+}
+</script>
+</body>
+</html>
